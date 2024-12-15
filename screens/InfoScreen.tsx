@@ -6,6 +6,7 @@ import * as SplashScreen from "expo-splash-screen";
 import * as ImagePicker from "expo-image-picker";
 import { storage } from "../config/firebase";
 import { createStackNavigator } from "@react-navigation/stack";
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -40,6 +41,25 @@ const InfoScreen = () => {
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
+      console.log(image)
+    }
+
+    try {
+      const response = await fetch(image);
+      // Check if the fetch was successful
+      if (!response.ok) {
+        console.error("Failed to fetch image:", response.statusText);
+        return null;
+      }
+
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+
+      const blob = await response.blob();
+      const storageRef = ref(storage, `images/${timestamp}.gif`);
+      const snapshot = await uploadBytes(storageRef, blob);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      return null; // Return null in case of an error
     }
   };
 
