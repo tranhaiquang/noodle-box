@@ -19,12 +19,12 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.sh4rry.noodlebox"
     },
     "web": {
       "bundler": "metro",
       "favicon": "./assets/favicon.png"
     }
-    
   }
 }

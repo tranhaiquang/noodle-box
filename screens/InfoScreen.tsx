@@ -56,6 +56,7 @@ const InfoScreen = () => {
         }}
         source={require("../assets/bg.png")}
       />
+
       {/* Logo */}
       <Image style={{ height: height * 0.1, width: width * 0.25 }} source={require("../assets/logo.png")} />
       <Text

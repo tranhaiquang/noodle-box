@@ -8,8 +8,6 @@ import WelcomeScreen from "./screens/WelcomeScreen";
 import HomeScreen from "./screens/HomeScreen";
 const Stack = createStackNavigator<RootStackParamList>();
 
-
-
 export default function App() {
   return (
 
