@@ -1,35 +1,51 @@
-import React, { useEffect } from "react";
-import { View, Button, Text, StyleSheet, Image } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
-import "../global.css";
+import React from 'react';
+import { View, TouchableOpacity, Text, StyleSheet } from 'react-native'
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
-SplashScreen.preventAutoHideAsync();
+const Stack = createStackNavigator();
 
-const HomeScreen = () => {
-  const [loaded, error] = useFonts({
-    "SVN-Nexa Rust Slab Black Shadow": require("../assets/fonts/SVN-Nexa Rust/SVN-Nexa Rust Slab Black Shadow.ttf"),
-  });
+const HomeScreen = ({ navigation }: { navigation: any }) => {
+    console.log("HomeScreen loaded"); // Check if this screen is being rendered
 
-  useEffect(() => {
-    if (loaded || error) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded, error]);
+    return (
 
-  if (!loaded && !error) {
-    return null;
-  }
-
-  return (
-    <LinearGradient start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }} colors={["#F8A828", "#F8D838"]} className="flex-1 flexjustify-center items-center p-10">
-      <View className="flex-1 items-center">
-        <Image className="h-20 w-24" source={require("../assets/logo.png")}></Image>
-        <Text style={{ fontFamily: "SVN-Nexa Rust Slab Black Shadow", fontSize: 40, textAlign: "center", color: "#C71A1A", marginTop: 10 }}>Welcome</Text>
-      </View>
-    </LinearGradient>
-  );
+        <View style={styles.container}>
+            <Text style={styles.title}>Home Screen</Text>
+            <TouchableOpacity
+                style={styles.button}
+                onPress={() => navigation.navigate('Info')}
+            >
+                <Text style={styles.buttonText}>Go to Info Screen</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={styles.button}
+                onPress={() => navigation.navigate('Welcome')}
+            >
+                <Text style={styles.buttonText}>Go to Welcome Screen</Text>
+            </TouchableOpacity>
+        </View>
+    );
 };
-
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    title: {
+        fontSize: 24,
+        marginBottom: 20,
+    },
+    button: {
+        backgroundColor: '#007BFF',
+        padding: 15,
+        borderRadius: 10,
+        marginVertical: 10,
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+    },
+});
 export default HomeScreen;
