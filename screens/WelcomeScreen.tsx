@@ -51,122 +51,47 @@ const WelcomeScreen = () => {
                     position: "absolute",
                     width: "100%",
                     height: "110%",
-
                 }}
                 source={require("../assets/bg.png")}
             />
-            {/* Logo */}
+            {/* Logo and Header text */}
             <Image style={{ height: height * 0.1, width: width * 0.25 }} source={require("../assets/logo.png")} />
             <Text
                 style={{
                     fontFamily: "SVN-Nexa Rust Slab Black Shadow",
-                    fontSize: 30,
+                    fontSize: 40,
                     textAlign: "center",
                     color: "#C71A1A",
-                    marginTop: 10,
+                    marginTop: 30,
                 }}
             >
                 Welcome
             </Text>
 
-            {/* Info Card */}
-            <View
-                style={{
-                    backgroundColor: "#FFFFFF",
-                    borderRadius: 10,
-                    width: width * 0.9,
-                    marginTop: 20,
-                    elevation: 5,
-                    overflow: "hidden",
-                }}
-            >
-                <LinearGradient
-                    colors={["#F8A828", "#F8D838"]}
-                    style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        margin: 2,
-                        padding: 10,
-                        borderWidth: 1,
-                        borderColor: "#880B0B",
-                        borderRadius: 10,
-                    }}
-                >
-                    {/* Avatar */}
-                    <Image style={{ height: 80, width: 80 }} source={require("../assets/avatar.png")} />
-                    {/* Labels */}
-                    <View style={{ flex: 1, marginLeft: 10 }}>
-                        {["Full Name:", "Birthday:", "Gender:", "Department:"].map((label, idx) => (
-                            <Text key={idx} style={{ fontFamily: "Nunito", fontWeight: "bold", color: "#880B0B" }}>
-                                {label}
-                            </Text>
-                        ))}
-                    </View>
-                    {/* Values */}
-                    <View style={{ flex: 1 }}>
-                        {["Alice Mie", "12/10/1999", "Female", "Design"].map((value, idx) => (
-                            <Text key={idx} style={{ fontFamily: "Nunito", color: "#880B0B" }}>
-                                {value}
-                            </Text>
-                        ))}
-                    </View>
-                </LinearGradient>
-            </View>
+            {/* Video Section */}
+            <Image style={{ height: 200, width: 340, marginTop: 30 }} source={require("../assets/Frame.png")}></Image>
 
-            {/* Noodle Cups */}
-            <View style={{ flex: 1, width: "100%", zIndex: 1 }}>
-                {/* Noodle Cups */}
-                <View
-                    style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        marginHorizontal: 20,
-                        marginTop: 30,
-                    }}
-                >
-                    <View style={{ alignItems: "center" }}>
-                        <Image source={require("../assets/noodle-cup.png")} style={{ width: 100, height: 180 }} />
-                    </View>
-                    <View style={{ alignItems: "center" }}>
-                        <Image source={require("../assets/noodle-cup-heart.png")} style={{ width: 100, height: 180 }} />
-                    </View>
-                    <View style={{ alignItems: "center" }}>
-                        <Image source={require("../assets/noodle-cup-smile.png")} style={{ width: 100, height: 180 }} />
-                    </View>
-                </View>
-                {/* Noodle Count */}
-                <View style={{ marginTop: 20, alignItems: "center" }}>
-                    <Text style={{ fontFamily: "Paytone", fontSize: 16, color: "#880B0B", fontWeight: "light" }}>
-                        <Text style={{ color: "#C71A1A", }}>3</Text> cups of noodles left this month
-                    </Text>
+            {/*Scan Text*/}
+            <Image style={{ height: 40, width: 340, marginTop: 60 }} source={require("../assets/scan-text.png")}>
+
+            </Image>
+            {/* Dispense Section */}
+            <View style={{ flex: 1, flexDirection: 'row', justifyContent: "flex-end", alignItems: "center", marginTop: 120 }}>
+                <Image style={{ height: 180, width: 140 }} source={require("../assets/dispense-section.png")}>
+
+                </Image>
+                <View style={{ position: "absolute", left: 160 }}>
+                    <Image style={{ height: 50, width: 100, }} source={require("../assets/right-arrow.png")}></Image>
                 </View>
             </View>
 
-            {/* Button */}
-            <View style={{ zIndex: 0 }}>
-                <TouchableOpacity
-                    style={{
-                        backgroundColor: "#FFA500",
-                        borderRadius: 25,
-                        paddingVertical: 12,
-                        width: width * 0.7,
-                        alignItems: "center",
-                        elevation: 5,
-                    }}
-                    onPress={() => { pickImage() }}
-                >
-                    <View style={{ alignItems: "center" }}>
-                        <Text style={{ fontFamily: "Paytone", fontSize: 20, fontWeight: "900", color: "#8B0000" }}>Get your noodles</Text>
-                        <View style={{ flexDirection: "row", marginTop: 4 }}>
-                            <View style={{ width: 50, height: 3, backgroundColor: "#FFF", marginHorizontal: 5, borderRadius: 3 }} />
-                            <View style={{ width: 100, height: 3, backgroundColor: "#FFF", marginHorizontal: 5, borderRadius: 3 }} />
-                        </View>
-                    </View>
-                </TouchableOpacity>
-            </View>
 
-        </ScrollView>
+
+
+
+
+
+        </ScrollView >
 
     );
 };
