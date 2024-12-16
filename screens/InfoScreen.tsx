@@ -5,15 +5,14 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import * as ImagePicker from "expo-image-picker";
 import { storage } from "../config/firebase";
-import { createStackNavigator } from "@react-navigation/stack";
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes } from 'firebase/storage';
 
 SplashScreen.preventAutoHideAsync();
 
 const { width, height } = Dimensions.get("window");
 
 
-const InfoScreen = () => {
+const InfoScreen = ({ navigation }: { navigation: any }) => {
   const [loaded, error] = useFonts({
     "SVN-Nexa Rust Slab Black Shadow": require("../assets/fonts/SVN-Nexa Rust Slab Black Shadow.ttf"),
     Nunito: require("../assets/fonts/Nunito-VariableFont_wght.ttf"),
@@ -176,10 +175,10 @@ const InfoScreen = () => {
             alignItems: "center",
             elevation: 5,
           }}
-          onPress={() => { pickImage() }}
+          onPress={() => { navigation.navigate("Confirm") }}
         >
           <View style={{ alignItems: "center" }}>
-            <Text style={{ fontFamily: "Paytone", fontSize: 20, fontWeight: "900", color: "#8B0000" }}>Get your noodles</Text>
+            <Text style={{ fontFamily: "Paytone", fontSize: 20, fontWeight: "light", color: "#8B0000" }}>Get your noodles</Text>
             <View style={{ flexDirection: "row", marginTop: 4 }}>
               <View style={{ width: 50, height: 3, backgroundColor: "#FFF", marginHorizontal: 5, borderRadius: 3 }} />
               <View style={{ width: 100, height: 3, backgroundColor: "#FFF", marginHorizontal: 5, borderRadius: 3 }} />

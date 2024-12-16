@@ -11,7 +11,7 @@ SplashScreen.preventAutoHideAsync();
 
 const { width, height } = Dimensions.get("window");
 
-const WelcomeScreen = () => {
+const WelcomeScreen = ({ navigation }: { navigation: any }) => {
     const [loaded, error] = useFonts({
         "SVN-Nexa Rust Slab Black Shadow": require("../assets/fonts/SVN-Nexa Rust Slab Black Shadow.ttf"),
         Nunito: require("../assets/fonts/Nunito-VariableFont_wght.ttf"),
@@ -43,7 +43,6 @@ const WelcomeScreen = () => {
     };
 
     return (
-
         <ScrollView contentContainerStyle={{ alignItems: "center", flexGrow: 1, paddingVertical: 20 }}>
             <Image
                 style={{
@@ -54,6 +53,7 @@ const WelcomeScreen = () => {
                 }}
                 source={require("../assets/bg.png")}
             />
+
             {/* Logo and Header text */}
             <Image style={{ height: height * 0.1, width: width * 0.25 }} source={require("../assets/logo.png")} />
             <Text
@@ -69,27 +69,28 @@ const WelcomeScreen = () => {
             </Text>
 
             {/* Video Section */}
-            <Image style={{ height: 200, width: 340, marginTop: 30 }} source={require("../assets/Frame.png")}></Image>
+            <View>
+                <Image style={{ height: 200, width: 340, marginTop: 30 }} source={require("../assets/Frame.png")}></Image>
+
+            </View>
 
             {/*Scan Text*/}
-            <Image style={{ height: 40, width: 340, marginTop: 60 }} source={require("../assets/scan-text.png")}>
+            <View>
+                <Image style={{ height: 40, width: 340, marginTop: 60 }} source={require("../assets/scan-text.png")}>
+                </Image>
+            </View>
 
-            </Image>
+
             {/* Dispense Section */}
             <View style={{ flex: 1, flexDirection: 'row', justifyContent: "flex-end", alignItems: "center", marginTop: 120 }}>
-                <Image style={{ height: 180, width: 140 }} source={require("../assets/dispense-section.png")}>
-
-                </Image>
+                <TouchableOpacity onPress={() => { navigation.navigate("Info") }}>
+                    <Image style={{ height: 180, width: 140 }} source={require("../assets/dispense-section.png")}>
+                    </Image>
+                </TouchableOpacity>
                 <View style={{ position: "absolute", left: 160 }}>
                     <Image style={{ height: 50, width: 100, }} source={require("../assets/right-arrow.png")}></Image>
                 </View>
             </View>
-
-
-
-
-
-
 
         </ScrollView >
 
