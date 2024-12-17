@@ -20,6 +20,7 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
   });
 
   const [image, setImage] = useState("");
+  const [isFirstNoodleSelected, setFirstNoodleSelected] = useState(false);
 
   useEffect(() => {
     if (loaded || error) {
@@ -137,7 +138,7 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
 
       {/* Noodle Cups */}
       <View style={{ flex: 1, width: "100%", zIndex: 1 }}>
-        {/* Noodle Cups */}
+
         <View
           style={{
             flexDirection: "row",
@@ -147,12 +148,24 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
           }}
         >
           <View style={{ alignItems: "center" }}>
-            <Image source={require("../assets/noodle-cup.png")} style={{ width: 100, height: 180 }} />
+            {
+              isFirstNoodleSelected && (
+                <Image source={require("../assets/select-circle.png")} style={{ width: 100, height: 100, position: "absolute", marginTop: 60 }}></Image>
+              )
+            }
+            <TouchableOpacity onPress={() => { setFirstNoodleSelected(!isFirstNoodleSelected) }}>
+              <Image source={require("../assets/noodle-cup.png")} style={{ width: 100, height: 180 }} />
+            </TouchableOpacity>
+
           </View>
           <View style={{ alignItems: "center" }}>
+            <Image source={require("../assets/select-circle.png")} style={{ width: 100, height: 100, position: "absolute", marginTop: 60 }}></Image>
+
             <Image source={require("../assets/noodle-cup-heart.png")} style={{ width: 100, height: 180 }} />
           </View>
           <View style={{ alignItems: "center" }}>
+            <Image source={require("../assets/select-circle.png")} style={{ width: 100, height: 100, position: "absolute", marginTop: 60 }}></Image>
+
             <Image source={require("../assets/noodle-cup-smile.png")} style={{ width: 100, height: 180 }} />
           </View>
         </View>
