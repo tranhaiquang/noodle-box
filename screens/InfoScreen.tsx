@@ -20,8 +20,14 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
   });
 
   const [image, setImage] = useState("");
-  const [isFirstNoodleSelected, setFirstNoodleSelected] = useState(false);
 
+  const [isFirstNoodleSelected, setFirstNoodleSelected] = useState(false);
+  const [isSecondNoodleSelected, setSecondNoodleSelected] = useState(false);
+  const [isThirdNoodleSelected, setThirdNoodleSelected] = useState(false)
+
+  const [firstNoodleCount, setFirstNoodleCount] = useState(0)
+  const [secondNoodleCount, setSecondNoodleCount] = useState(2)
+  const [thirdNoodleCount, setThirdNoodleCount] = useState(10)
   useEffect(() => {
     if (loaded || error) {
       SplashScreen.hideAsync();
@@ -154,19 +160,40 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
               )
             }
             <TouchableOpacity onPress={() => { setFirstNoodleSelected(!isFirstNoodleSelected) }}>
-              <Image source={require("../assets/noodle-cup.png")} style={{ width: 100, height: 180 }} />
+              {
+                firstNoodleCount > 0 ? (<Image source={require("../assets/noodle-cup.png")} style={{ width: 100, height: 180 }} />
+                ) : (<Image source={require("../assets/unavailable-noodle-cup.png")} style={{ width: 100, height: 180 }} />
+                )
+              }
             </TouchableOpacity>
 
           </View>
           <View style={{ alignItems: "center" }}>
-            <Image source={require("../assets/select-circle.png")} style={{ width: 100, height: 100, position: "absolute", marginTop: 60 }}></Image>
-
-            <Image source={require("../assets/noodle-cup-heart.png")} style={{ width: 100, height: 180 }} />
+            {
+              isSecondNoodleSelected && (<Image source={require("../assets/select-circle.png")} style={{ width: 100, height: 100, position: "absolute", marginTop: 60 }}></Image>
+              )
+            }
+            <TouchableOpacity onPress={() => { setSecondNoodleSelected(!isSecondNoodleSelected) }}>
+              {
+                secondNoodleCount > 0 ? (<Image source={require("../assets/noodle-cup-heart.png")} style={{ width: 100, height: 180 }} />
+                ) : (<Image source={require("../assets/unavailable-noodle-cup.png")} style={{ width: 100, height: 180 }} />
+                )
+              }
+            </TouchableOpacity>
           </View>
           <View style={{ alignItems: "center" }}>
-            <Image source={require("../assets/select-circle.png")} style={{ width: 100, height: 100, position: "absolute", marginTop: 60 }}></Image>
+            {isThirdNoodleSelected && (
+              <Image source={require("../assets/select-circle.png")} style={{ width: 100, height: 100, position: "absolute", marginTop: 60 }}></Image>
 
-            <Image source={require("../assets/noodle-cup-smile.png")} style={{ width: 100, height: 180 }} />
+            )}
+            <TouchableOpacity onPress={() => { setThirdNoodleSelected(!isThirdNoodleSelected) }}>
+
+              {
+                thirdNoodleCount > 0 ? (<Image source={require("../assets/noodle-cup-smile.png")} style={{ width: 100, height: 180 }} />
+                ) : (<Image source={require("../assets/unavailable-noodle-cup.png")} style={{ width: 100, height: 180 }} />
+                )
+              }
+            </TouchableOpacity>
           </View>
         </View>
         {/* Noodle Count */}

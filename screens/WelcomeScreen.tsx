@@ -55,18 +55,23 @@ const WelcomeScreen = ({ navigation }: { navigation: any }) => {
             />
 
             {/* Logo and Header text */}
-            <Image style={{ height: height * 0.1, width: width * 0.25 }} source={require("../assets/logo.png")} />
-            <Text
-                style={{
-                    fontFamily: "SVN-Nexa Rust Slab Black Shadow",
-                    fontSize: 40,
-                    textAlign: "center",
-                    color: "#C71A1A",
-                    marginTop: 30,
-                }}
-            >
-                Welcome
-            </Text>
+            <View>
+                <Image style={{ height: height * 0.1, width: width * 0.25 }} source={require("../assets/logo.png")} />
+            </View>
+            <View>
+                <Text
+                    style={{
+                        fontFamily: "SVN-Nexa Rust Slab Black Shadow",
+                        fontSize: 40,
+                        textAlign: "center",
+                        color: "#C71A1A",
+                        marginTop: 30,
+                    }}
+                >
+                    Welcome
+                </Text>
+            </View>
+
 
             {/* Video Section */}
             <View>
