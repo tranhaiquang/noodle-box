@@ -169,8 +169,11 @@ const ConfirmationScreen = ({ navigation }: { navigation: any }) => {
 
                     {/*Arrow image*/}
                     <View style={{ flex: 1, alignItems: "center" }}>
-                        <Image style={{ height: 40, width: 25 }} source={require("../assets/down-arrow.png")}>
-                        </Image>
+                        <TouchableOpacity onPress={() => { navigation.navigate("OutOfNoodle") }}>
+                            <Image style={{ height: 40, width: 25 }} source={require("../assets/down-arrow.png")}>
+                            </Image>
+
+                        </TouchableOpacity>
                     </View>
                 </View>
             </ScrollView>

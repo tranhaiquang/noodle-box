@@ -74,10 +74,13 @@ const OutOfNoodleScreen = ({ navigation }: { navigation: any }) => {
 
                 {/* Missing Noodle Image */}
                 <View style={{ flex: 1 }}>
-                    <Image
-                        style={{ height: 140, width: 210 }}
-                        source={require("../assets/missing-noodle.png")}
-                    />
+                    <TouchableOpacity onPress={() => { navigation.navigate("Welcome") }}>
+                        <Image
+                            style={{ height: 140, width: 210 }}
+                            source={require("../assets/missing-noodle.png")}
+                        />
+
+                    </TouchableOpacity>
                 </View>
 
             </ScrollView>
