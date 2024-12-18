@@ -6,6 +6,8 @@ import { RootStackParamList } from "./navigation/types";
 import InfoScreen from "./screens/InfoScreen";
 import WelcomeScreen from "./screens/WelcomeScreen";
 import ConfirmationScreen from "./screens/ConfirmationScreen";
+import OutOfNoodleScreen from "./screens/OutOfNoodleScreen";
+import ErrorScreen from "./screens/ErrorScreen";
 const Stack = createStackNavigator<RootStackParamList>();
 
 export default function App() {
@@ -16,6 +18,8 @@ export default function App() {
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
         <Stack.Screen name="Info" component={InfoScreen} />
         <Stack.Screen name="Confirm" component={ConfirmationScreen} />
+        <Stack.Screen name="OutOfNoodle" component={OutOfNoodleScreen} />
+        <Stack.Screen name="Error" component={ErrorScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -11,7 +11,7 @@ SplashScreen.preventAutoHideAsync();
 
 const { width, height } = Dimensions.get("window");
 
-const WelcomeScreen = ({ navigation }: { navigation: any }) => {
+const ErrorScreen = ({ navigation }: { navigation: any }) => {
     const [loaded, error] = useFonts({
         "SVN-Nexa Rust Slab Black Shadow": require("../assets/fonts/SVN-Nexa Rust Slab Black Shadow.ttf"),
         Nunito: require("../assets/fonts/Nunito-VariableFont_wght.ttf"),
@@ -55,10 +55,10 @@ const WelcomeScreen = ({ navigation }: { navigation: any }) => {
             />
 
             {/* Logo and Header text */}
-            <View>
+            <View style={{ flex: 1 }}>
                 <Image style={{ height: height * 0.1, width: width * 0.25 }} source={require("../assets/logo.png")} />
             </View>
-            <View>
+            <View style={{ flex: 1 }}>
                 <Text
                     style={{
                         fontFamily: "SVN-Nexa Rust Slab Black Shadow",
@@ -68,35 +68,41 @@ const WelcomeScreen = ({ navigation }: { navigation: any }) => {
                         marginTop: 30,
                     }}
                 >
-                    Welcome
+                    Error
                 </Text>
             </View>
 
-            {/* Video Section */}
-            <View>
-                <Image style={{ height: 200, width: 340, marginTop: 30 }} source={require("../assets/Frame.png")}></Image>
+
+            {/* Can't recongnize Text */}
+            <View style={{ flex: 1, marginTop: 10 }}>
+                <Text style={{ fontFamily: "Nunito", fontSize: 20, fontWeight: "bold", color: "#980000" }}>Can not recongnize your ID card. </Text>
+            </View>
+
+            {/* Try again text */}
+            <View style={{ flex: 1, marginTop: 20 }}>
+                <Image style={{ height: 32, width: 160 }} source={require("../assets/scan-again.png")}></Image>
+            </View>
+
+            {/* Error Image */}
+            <View style={{ flex: 1, marginTop: 20 }}>
+                <Image style={{ height: 170, width: 140 }} source={require("../assets/error.png")}></Image>
             </View>
 
             {/*Scan Text*/}
-            <View>
-                <Image style={{ height: 40, width: 340, marginTop: 60 }} source={require("../assets/scan-text.png")}>
+            <View style={{ flex: 1, marginTop: 20 }}>
+                <Image style={{ height: 40, width: 340, }} source={require("../assets/scan-text.png")}>
                 </Image>
             </View>
 
-
             {/* Dispense Section */}
             <View style={{ flex: 1, flexDirection: 'row', justifyContent: "flex-end", alignItems: "center", marginTop: 120 }}>
-                <TouchableOpacity onPress={() => { navigation.navigate("Info") }}>
+                <TouchableOpacity onPress={() => { navigation.navigate("Welcome") }}>
                     <Image style={{ height: 180, width: 140 }} source={require("../assets/dispense-section.png")}>
                     </Image>
                 </TouchableOpacity>
-
                 <View style={{ position: "absolute", left: 160 }}>
-                    <TouchableOpacity onPress={() => { navigation.navigate("Error") }}>
-                        <Image style={{ height: 50, width: 100, }} source={require("../assets/right-arrow.png")}></Image>
-                    </TouchableOpacity>
+                    <Image style={{ height: 50, width: 100, }} source={require("../assets/right-arrow.png")}></Image>
                 </View>
-
             </View>
 
         </ScrollView >
@@ -104,4 +110,4 @@ const WelcomeScreen = ({ navigation }: { navigation: any }) => {
     );
 };
 
-export default WelcomeScreen;
+export default ErrorScreen;
