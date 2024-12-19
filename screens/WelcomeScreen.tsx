@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { View, TouchableOpacity, Text, Image, Dimensions, ScrollView } from "react-native";
+import { View, TouchableOpacity, Text, Dimensions, ScrollView } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import * as ImagePicker from "expo-image-picker";
 import { storage } from "../config/firebase";
-import { createStackNavigator } from "@react-navigation/stack";
-
+import { ref, getDownloadURL } from "firebase/storage";
+import { Image } from 'expo-image';
 SplashScreen.preventAutoHideAsync();
 
 const { width, height } = Dimensions.get("window");
@@ -19,11 +19,26 @@ const WelcomeScreen = ({ navigation }: { navigation: any }) => {
     });
 
     const [image, setImage] = useState("");
+    const [noodleGifUrl, setNoodleGifUrl] = useState("");
 
+    const fetchNoodleGif = async () => {
+        try {
+            // Reference to your image in Firebase Storage
+            const imageRef = ref(storage, "images/noodle-clip.gif");
+
+            // Get the download URL
+            const url = await getDownloadURL(imageRef);
+
+            setNoodleGifUrl(url)
+        } catch (error) {
+            console.error("Error fetching image: ", error);
+        }
+    };
     useEffect(() => {
         if (loaded || error) {
             SplashScreen.hideAsync();
         }
+        fetchNoodleGif();
     }, [loaded, error]);
 
     if (!loaded && !error) return null;
@@ -41,6 +56,7 @@ const WelcomeScreen = ({ navigation }: { navigation: any }) => {
             setImage(result.assets[0].uri);
         }
     };
+
 
     return (
         <ScrollView contentContainerStyle={{ alignItems: "center", flexGrow: 1, paddingVertical: 20 }}>
@@ -73,8 +89,44 @@ const WelcomeScreen = ({ navigation }: { navigation: any }) => {
             </View>
 
             {/* Video Section */}
-            <View>
-                <Image style={{ height: 200, width: 340, marginTop: 30 }} source={require("../assets/Frame.png")}></Image>
+            <View
+                style={{
+                    backgroundColor: "#FFFFFF",
+                    borderRadius: 10,
+                    width: width * 0.9,
+                    height: 217,
+                    marginTop: 20,
+
+                }}
+            >
+
+                <LinearGradient
+                    colors={["#F8A828", "#F8D838"]}
+                    style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        margin: 2,
+                        padding: 10,
+                        borderWidth: 1,
+                        borderColor: "#880B0B",
+                        borderRadius: 10,
+                    }}
+                >
+                    {
+                        noodleGifUrl && (
+                            <Image
+                                style={{
+                                    width: 330,
+                                    height: 190,
+                                }}
+                                source={{ uri: noodleGifUrl }}
+                            />
+                        )
+                    }
+
+                </LinearGradient>
+
             </View>
 
             {/*Scan Text*/}

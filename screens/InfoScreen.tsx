@@ -1,19 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { View, TouchableOpacity, Text, Image, Dimensions, ScrollView } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import { View, TouchableOpacity, Text, Image, Dimensions, ScrollView, ActivityIndicator } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import * as ImagePicker from "expo-image-picker";
 import { storage } from "../config/firebase";
 import { ref, uploadBytes } from 'firebase/storage';
-
+import { db, } from '../config/firebase'
+import { doc, getDoc } from 'firebase/firestore'
 SplashScreen.preventAutoHideAsync();
 
 const { width, height } = Dimensions.get("window");
 
 
 const InfoScreen = ({ navigation }: { navigation: any }) => {
-  const [loaded, error] = useFonts({
+  const [fontLoaded, error] = useFonts({
     "SVN-Nexa Rust Slab Black Shadow": require("../assets/fonts/SVN-Nexa Rust Slab Black Shadow.ttf"),
     Nunito: require("../assets/fonts/Nunito-VariableFont_wght.ttf"),
     Paytone: require("../assets/fonts/PaytoneOne-Regular.ttf")
@@ -25,16 +26,59 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
   const [isSecondNoodleSelected, setSecondNoodleSelected] = useState(false);
   const [isThirdNoodleSelected, setThirdNoodleSelected] = useState(false)
 
-  const [firstNoodleCount, setFirstNoodleCount] = useState(0)
-  const [secondNoodleCount, setSecondNoodleCount] = useState(2)
-  const [thirdNoodleCount, setThirdNoodleCount] = useState(10)
-  useEffect(() => {
-    if (loaded || error) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded, error]);
 
-  if (!loaded && !error) return null;
+  const [noodleCounts, setNoodleCounts] = useState({
+    heartNoodle: 0,
+    smileNoodle: 0,
+    winkNoodle: 0,
+  });
+
+  const getNoodleCount = async () => {
+    try {
+      // Reference to the document you want to fetch
+      const docRef = doc(db, "noodle-box", "noodle-count") // Replace 'noodles' with your collection and 'document-id' with the document ID
+
+      // Fetch the document
+      const documentSnapshot = await getDoc(docRef)
+
+      if (documentSnapshot.exists()) {
+        setNoodleCounts({
+          heartNoodle: documentSnapshot.data().heartNoodle,
+          smileNoodle: documentSnapshot.data().smileNoodle,
+          winkNoodle: documentSnapshot.data().winkNoodle,
+        });
+      } else {
+        console.log("No such document!");
+        return -1;
+      }
+    } catch (error) {
+      console.error('Error fetching document: ', error);
+    }
+  };
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await getNoodleCount(); // Fetch noodle counts when the component mounts
+    };
+    fetchData(); // Call fetch function
+  }, []); // Empty dependency array to run this effect only once when the component mounts
+
+
+  useEffect(() => {
+    if (fontLoaded || error) {
+      SplashScreen.hideAsync(); // Hide the splash screen once fonts are loaded or there's an error
+    }
+  }, [fontLoaded, error]); // Run the effect whenever fontsLoaded or error changes
+
+  if (!fontLoaded && !error) {
+    return null; // App should wait until fonts are loaded or error occurs
+  }
+
+  if (error) {
+    return <Text>Error loading fonts</Text>; // Display error message if fonts fail to load
+  }
+
 
   // Pick Image Function
   const pickImage = async () => {
@@ -68,6 +112,8 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
       return null; // Return null in case of an error
     }
   };
+
+
 
   return (
 
@@ -161,7 +207,7 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
             }
             <TouchableOpacity onPress={() => { setFirstNoodleSelected(!isFirstNoodleSelected) }}>
               {
-                firstNoodleCount > 0 ? (<Image source={require("../assets/noodle-cup.png")} style={{ width: 100, height: 180 }} />
+                noodleCounts.smileNoodle > 0 ? (<Image source={require("../assets/noodle-cup.png")} style={{ width: 100, height: 180 }} />
                 ) : (<Image source={require("../assets/unavailable-noodle-cup.png")} style={{ width: 100, height: 180 }} />
                 )
               }
@@ -175,7 +221,7 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
             }
             <TouchableOpacity onPress={() => { setSecondNoodleSelected(!isSecondNoodleSelected) }}>
               {
-                secondNoodleCount > 0 ? (<Image source={require("../assets/noodle-cup-heart.png")} style={{ width: 100, height: 180 }} />
+                noodleCounts.heartNoodle > 0 ? (<Image source={require("../assets/noodle-cup-heart.png")} style={{ width: 100, height: 180 }} />
                 ) : (<Image source={require("../assets/unavailable-noodle-cup.png")} style={{ width: 100, height: 180 }} />
                 )
               }
@@ -189,7 +235,7 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
             <TouchableOpacity onPress={() => { setThirdNoodleSelected(!isThirdNoodleSelected) }}>
 
               {
-                thirdNoodleCount > 0 ? (<Image source={require("../assets/noodle-cup-smile.png")} style={{ width: 100, height: 180 }} />
+                noodleCounts.winkNoodle > 0 ? (<Image source={require("../assets/noodle-cup-smile.png")} style={{ width: 100, height: 180 }} />
                 ) : (<Image source={require("../assets/unavailable-noodle-cup.png")} style={{ width: 100, height: 180 }} />
                 )
               }
@@ -215,7 +261,25 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
             alignItems: "center",
             elevation: 5,
           }}
-          onPress={() => { navigation.navigate("Confirm") }}
+          onPress={() => {
+            if (isFirstNoodleSelected) {
+              noodleCounts.smileNoodle -= 1
+
+            }
+
+            if (isSecondNoodleSelected) {
+              noodleCounts.heartNoodle -= 1
+
+            }
+
+            if (isThirdNoodleSelected) {
+              noodleCounts.winkNoodle -= 1
+
+            }
+
+
+            navigation.navigate("Confirm")
+          }}
         >
           <View style={{ alignItems: "center" }}>
             <Text style={{ fontFamily: "Paytone", fontSize: 20, fontWeight: "light", color: "#8B0000" }}>Get your noodles</Text>
