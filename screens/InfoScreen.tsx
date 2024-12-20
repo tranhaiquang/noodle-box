@@ -7,7 +7,7 @@ import * as ImagePicker from "expo-image-picker";
 import { storage } from "../config/firebase";
 import { ref, uploadBytes } from 'firebase/storage';
 import { db, } from '../config/firebase'
-import { doc, getDoc } from 'firebase/firestore'
+import { doc, getDoc, setDoc } from 'firebase/firestore'
 SplashScreen.preventAutoHideAsync();
 
 const { width, height } = Dimensions.get("window");
@@ -22,16 +22,23 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
 
   const [image, setImage] = useState("");
 
-  const [isFirstNoodleSelected, setFirstNoodleSelected] = useState(false);
-  const [isSecondNoodleSelected, setSecondNoodleSelected] = useState(false);
-  const [isThirdNoodleSelected, setThirdNoodleSelected] = useState(false)
+  // First Noodle Cup
+  const [isSmileNoodleSelected, setSmileNoodleSelected] = useState(false);
+  // Second Noodle Cup
+  const [isHeartNoodleSelected, setHeartNoodleSelected] = useState(false);
+  // Third Noodle Cup
+  const [isWinkNoodleSelected, setWinkNoodleSelected] = useState(false)
 
 
   const [noodleCounts, setNoodleCounts] = useState({
     heartNoodle: 0,
     smileNoodle: 0,
     winkNoodle: 0,
+
   });
+
+  const totalNoodle = noodleCounts.heartNoodle + noodleCounts.smileNoodle + noodleCounts.winkNoodle;
+
 
   const getNoodleCount = async () => {
     try {
@@ -56,13 +63,18 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
     }
   };
 
+  // update noodle count when users click "Get your noodles"
+  const updateNoodleCount = async (fieldId: string, count: number) => {
+    const docRef = doc(db, "noodle-box", "noodle-count");
+    await setDoc(docRef, { [fieldId]: count }, { merge: true })
+  }
 
   useEffect(() => {
     const fetchData = async () => {
-      await getNoodleCount(); // Fetch noodle counts when the component mounts
+      await getNoodleCount();
     };
-    fetchData(); // Call fetch function
-  }, []); // Empty dependency array to run this effect only once when the component mounts
+    fetchData();
+  }, []);
 
 
   useEffect(() => {
@@ -109,7 +121,7 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
       const snapshot = await uploadBytes(storageRef, blob);
     } catch (error) {
       console.error("Error uploading image:", error);
-      return null; // Return null in case of an error
+      return null;
     }
   };
 
@@ -201,11 +213,11 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
         >
           <View style={{ alignItems: "center" }}>
             {
-              isFirstNoodleSelected && (
+              isSmileNoodleSelected && (
                 <Image source={require("../assets/select-circle.png")} style={{ width: 100, height: 100, position: "absolute", marginTop: 60 }}></Image>
               )
             }
-            <TouchableOpacity onPress={() => { setFirstNoodleSelected(!isFirstNoodleSelected) }}>
+            <TouchableOpacity onPress={() => { setSmileNoodleSelected(!isSmileNoodleSelected) }}>
               {
                 noodleCounts.smileNoodle > 0 ? (<Image source={require("../assets/noodle-cup.png")} style={{ width: 100, height: 180 }} />
                 ) : (<Image source={require("../assets/unavailable-noodle-cup.png")} style={{ width: 100, height: 180 }} />
@@ -216,10 +228,10 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
           </View>
           <View style={{ alignItems: "center" }}>
             {
-              isSecondNoodleSelected && (<Image source={require("../assets/select-circle.png")} style={{ width: 100, height: 100, position: "absolute", marginTop: 60 }}></Image>
+              isHeartNoodleSelected && (<Image source={require("../assets/select-circle.png")} style={{ width: 100, height: 100, position: "absolute", marginTop: 60 }}></Image>
               )
             }
-            <TouchableOpacity onPress={() => { setSecondNoodleSelected(!isSecondNoodleSelected) }}>
+            <TouchableOpacity onPress={() => { setHeartNoodleSelected(!isHeartNoodleSelected) }}>
               {
                 noodleCounts.heartNoodle > 0 ? (<Image source={require("../assets/noodle-cup-heart.png")} style={{ width: 100, height: 180 }} />
                 ) : (<Image source={require("../assets/unavailable-noodle-cup.png")} style={{ width: 100, height: 180 }} />
@@ -228,11 +240,11 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
             </TouchableOpacity>
           </View>
           <View style={{ alignItems: "center" }}>
-            {isThirdNoodleSelected && (
+            {isWinkNoodleSelected && (
               <Image source={require("../assets/select-circle.png")} style={{ width: 100, height: 100, position: "absolute", marginTop: 60 }}></Image>
 
             )}
-            <TouchableOpacity onPress={() => { setThirdNoodleSelected(!isThirdNoodleSelected) }}>
+            <TouchableOpacity onPress={() => { setWinkNoodleSelected(!isWinkNoodleSelected) }}>
 
               {
                 noodleCounts.winkNoodle > 0 ? (<Image source={require("../assets/noodle-cup-smile.png")} style={{ width: 100, height: 180 }} />
@@ -245,7 +257,7 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
         {/* Noodle Count */}
         <View style={{ marginTop: 20, alignItems: "center" }}>
           <Text style={{ fontFamily: "Paytone", fontSize: 16, color: "#880B0B", fontWeight: "light" }}>
-            <Text style={{ color: "#C71A1A", }}>3</Text> cups of noodles left this month
+            <Text style={{ color: "#C71A1A", }}>{totalNoodle}</Text> cups of noodles left this month
           </Text>
         </View>
       </View>
@@ -262,22 +274,17 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
             elevation: 5,
           }}
           onPress={() => {
-            if (isFirstNoodleSelected) {
-              noodleCounts.smileNoodle -= 1
-
+            if (isSmileNoodleSelected) {
+              updateNoodleCount("smileNoodle", noodleCounts.smileNoodle - 1);
             }
 
-            if (isSecondNoodleSelected) {
-              noodleCounts.heartNoodle -= 1
-
+            if (isHeartNoodleSelected) {
+              updateNoodleCount("heartNoodle", noodleCounts.heartNoodle - 1);
             }
 
-            if (isThirdNoodleSelected) {
-              noodleCounts.winkNoodle -= 1
-
+            if (isWinkNoodleSelected) {
+              updateNoodleCount("winkNoodle", noodleCounts.winkNoodle - 1);
             }
-
-
             navigation.navigate("Confirm")
           }}
         >

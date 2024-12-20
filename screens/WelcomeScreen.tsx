@@ -7,6 +7,8 @@ import * as ImagePicker from "expo-image-picker";
 import { storage } from "../config/firebase";
 import { ref, getDownloadURL } from "firebase/storage";
 import { Image } from 'expo-image';
+import { db, } from '../config/firebase'
+import { doc, getDoc, setDoc } from 'firebase/firestore'
 SplashScreen.preventAutoHideAsync();
 
 const { width, height } = Dimensions.get("window");
@@ -20,6 +22,38 @@ const WelcomeScreen = ({ navigation }: { navigation: any }) => {
 
     const [image, setImage] = useState("");
     const [noodleGifUrl, setNoodleGifUrl] = useState("");
+
+    const [noodleCounts, setNoodleCounts] = useState({
+        heartNoodle: 0,
+        smileNoodle: 0,
+        winkNoodle: 0,
+
+    });
+
+    const totalNoodle = noodleCounts.heartNoodle + noodleCounts.smileNoodle + noodleCounts.winkNoodle;
+
+    const getNoodleCount = async () => {
+        try {
+            // Reference to the document you want to fetch
+            const docRef = doc(db, "noodle-box", "noodle-count") // Replace 'noodles' with your collection and 'document-id' with the document ID
+
+            // Fetch the document
+            const documentSnapshot = await getDoc(docRef)
+
+            if (documentSnapshot.exists()) {
+                setNoodleCounts({
+                    heartNoodle: documentSnapshot.data().heartNoodle,
+                    smileNoodle: documentSnapshot.data().smileNoodle,
+                    winkNoodle: documentSnapshot.data().winkNoodle,
+                });
+            } else {
+                console.log("No such document!");
+                return -1;
+            }
+        } catch (error) {
+            console.error('Error fetching document: ', error);
+        }
+    };
 
     const fetchNoodleGif = async () => {
         try {
@@ -39,6 +73,8 @@ const WelcomeScreen = ({ navigation }: { navigation: any }) => {
             SplashScreen.hideAsync();
         }
         fetchNoodleGif();
+        getNoodleCount();
+
     }, [loaded, error]);
 
     if (!loaded && !error) return null;
@@ -138,7 +174,14 @@ const WelcomeScreen = ({ navigation }: { navigation: any }) => {
 
             {/* Dispense Section */}
             <View style={{ flex: 1, flexDirection: 'row', justifyContent: "flex-end", alignItems: "center", marginTop: 120 }}>
-                <TouchableOpacity onPress={() => { navigation.navigate("Info") }}>
+                <TouchableOpacity onPress={() => {
+                    if (totalNoodle > 0) {
+                        navigation.navigate("Info")
+                    }
+                    else {
+                        navigation.navigate("OutOfNoodle")
+                    }
+                }}>
                     <Image style={{ height: 180, width: 140 }} source={require("../assets/dispense-section.png")}>
                     </Image>
                 </TouchableOpacity>
