@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getStorage } from "firebase/storage";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -18,9 +18,33 @@ const firebaseConfig = {
   measurementId: "G-HEPVYQF0PS",
 };
 
+const getNoodleCount = async () => {
+  try {
+    // Reference to the document you want to fetch
+    const docRef = doc(db, "noodle-box", "noodle-count");
+
+    // Fetch the document
+    const documentSnapshot = await getDoc(docRef);
+
+    if (documentSnapshot.exists()) {
+      return {
+        heartNoodle: documentSnapshot.data().heartNoodle,
+        smileNoodle: documentSnapshot.data().smileNoodle,
+        winkNoodle: documentSnapshot.data().winkNoodle,
+      };
+    } else {
+      console.log("No such document!");
+      return null; // Returning null instead of -1
+    }
+  } catch (error) {
+    console.error("Error fetching document: ", error);
+    return null; // Returning null on error
+  }
+};
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const storage = getStorage(app);
 const db = getFirestore(app);
-export { storage, db };
+export { storage, db, getNoodleCount };

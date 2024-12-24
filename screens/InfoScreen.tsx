@@ -21,6 +21,7 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
   });
 
   const [image, setImage] = useState("");
+  const [loading, setLoading] = useState(true);
 
   // First Noodle Cup
   const [isSmileNoodleSelected, setSmileNoodleSelected] = useState(false);
@@ -72,6 +73,7 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
   useEffect(() => {
     const fetchData = async () => {
       await getNoodleCount();
+      setLoading(false);
     };
     fetchData();
   }, []);
@@ -85,10 +87,6 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
 
   if (!fontLoaded && !error) {
     return null; // App should wait until fonts are loaded or error occurs
-  }
-
-  if (error) {
-    return <Text>Error loading fonts</Text>; // Display error message if fonts fail to load
   }
 
 
@@ -202,58 +200,59 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
 
       {/* Noodle Cups */}
       <View style={{ flex: 1, width: "100%", zIndex: 1 }}>
+        {!loading &&
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginHorizontal: 20,
+              marginTop: 30,
+            }}
+          >
+            <View style={{ alignItems: "center" }}>
+              {
+                isSmileNoodleSelected && (
+                  <Image source={require("../assets/select-circle.png")} style={{ width: 100, height: 100, position: "absolute", marginTop: 60 }}></Image>
+                )
+              }
+              <TouchableOpacity onPress={() => { setSmileNoodleSelected(!isSmileNoodleSelected) }}>
+                {
+                  noodleCounts.smileNoodle > 0 ? (<Image source={require("../assets/noodle-cup.png")} style={{ width: 100, height: 180 }} />
+                  ) : (<Image source={require("../assets/unavailable-noodle-cup.png")} style={{ width: 100, height: 180 }} />
+                  )
+                }
+              </TouchableOpacity>
 
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginHorizontal: 20,
-            marginTop: 30,
-          }}
-        >
-          <View style={{ alignItems: "center" }}>
-            {
-              isSmileNoodleSelected && (
+            </View>
+            <View style={{ alignItems: "center" }}>
+              {
+                isHeartNoodleSelected && (<Image source={require("../assets/select-circle.png")} style={{ width: 100, height: 100, position: "absolute", marginTop: 60 }}></Image>
+                )
+              }
+              <TouchableOpacity onPress={() => { setHeartNoodleSelected(!isHeartNoodleSelected) }}>
+                {
+                  noodleCounts.heartNoodle > 0 ? (<Image source={require("../assets/noodle-cup-heart.png")} style={{ width: 100, height: 180 }} />
+                  ) : (<Image source={require("../assets/unavailable-noodle-cup.png")} style={{ width: 100, height: 180 }} />
+                  )
+                }
+              </TouchableOpacity>
+            </View>
+            <View style={{ alignItems: "center" }}>
+              {isWinkNoodleSelected && (
                 <Image source={require("../assets/select-circle.png")} style={{ width: 100, height: 100, position: "absolute", marginTop: 60 }}></Image>
-              )
-            }
-            <TouchableOpacity onPress={() => { setSmileNoodleSelected(!isSmileNoodleSelected) }}>
-              {
-                noodleCounts.smileNoodle > 0 ? (<Image source={require("../assets/noodle-cup.png")} style={{ width: 100, height: 180 }} />
-                ) : (<Image source={require("../assets/unavailable-noodle-cup.png")} style={{ width: 100, height: 180 }} />
-                )
-              }
-            </TouchableOpacity>
 
-          </View>
-          <View style={{ alignItems: "center" }}>
-            {
-              isHeartNoodleSelected && (<Image source={require("../assets/select-circle.png")} style={{ width: 100, height: 100, position: "absolute", marginTop: 60 }}></Image>
-              )
-            }
-            <TouchableOpacity onPress={() => { setHeartNoodleSelected(!isHeartNoodleSelected) }}>
-              {
-                noodleCounts.heartNoodle > 0 ? (<Image source={require("../assets/noodle-cup-heart.png")} style={{ width: 100, height: 180 }} />
-                ) : (<Image source={require("../assets/unavailable-noodle-cup.png")} style={{ width: 100, height: 180 }} />
-                )
-              }
-            </TouchableOpacity>
-          </View>
-          <View style={{ alignItems: "center" }}>
-            {isWinkNoodleSelected && (
-              <Image source={require("../assets/select-circle.png")} style={{ width: 100, height: 100, position: "absolute", marginTop: 60 }}></Image>
+              )}
+              <TouchableOpacity onPress={() => { setWinkNoodleSelected(!isWinkNoodleSelected) }}>
 
-            )}
-            <TouchableOpacity onPress={() => { setWinkNoodleSelected(!isWinkNoodleSelected) }}>
-
-              {
-                noodleCounts.winkNoodle > 0 ? (<Image source={require("../assets/noodle-cup-smile.png")} style={{ width: 100, height: 180 }} />
-                ) : (<Image source={require("../assets/unavailable-noodle-cup.png")} style={{ width: 100, height: 180 }} />
-                )
-              }
-            </TouchableOpacity>
+                {
+                  noodleCounts.winkNoodle > 0 ? (<Image source={require("../assets/noodle-cup-smile.png")} style={{ width: 100, height: 180 }} />
+                  ) : (<Image source={require("../assets/unavailable-noodle-cup.png")} style={{ width: 100, height: 180 }} />
+                  )
+                }
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
+        }
         {/* Noodle Count */}
         <View style={{ marginTop: 20, alignItems: "center" }}>
           <Text style={{ fontFamily: "Paytone", fontSize: 16, color: "#880B0B", fontWeight: "light" }}>
@@ -264,38 +263,62 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
 
       {/* Button */}
       <View style={{ zIndex: 0 }}>
-        <TouchableOpacity
-          style={{
-            backgroundColor: "#FFA500",
-            borderRadius: 25,
-            paddingVertical: 12,
-            width: width * 0.7,
-            alignItems: "center",
-            elevation: 5,
-          }}
-          onPress={() => {
-            if (isSmileNoodleSelected) {
-              updateNoodleCount("smileNoodle", noodleCounts.smileNoodle - 1);
-            }
+        {totalNoodle > 0 ? (
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#FFA500",
+              borderRadius: 25,
+              paddingVertical: 12,
+              width: width * 0.7,
+              alignItems: "center",
+              elevation: 5,
+            }}
+            onPress={() => {
+              if (isSmileNoodleSelected) {
+                updateNoodleCount("smileNoodle", noodleCounts.smileNoodle - 1);
+              }
 
-            if (isHeartNoodleSelected) {
-              updateNoodleCount("heartNoodle", noodleCounts.heartNoodle - 1);
-            }
+              if (isHeartNoodleSelected) {
+                updateNoodleCount("heartNoodle", noodleCounts.heartNoodle - 1);
+              }
 
-            if (isWinkNoodleSelected) {
-              updateNoodleCount("winkNoodle", noodleCounts.winkNoodle - 1);
-            }
-            navigation.navigate("Confirm")
-          }}
-        >
-          <View style={{ alignItems: "center" }}>
-            <Text style={{ fontFamily: "Paytone", fontSize: 20, fontWeight: "light", color: "#8B0000" }}>Get your noodles</Text>
-            <View style={{ flexDirection: "row", marginTop: 4 }}>
-              <View style={{ width: 50, height: 3, backgroundColor: "#FFF", marginHorizontal: 5, borderRadius: 3 }} />
-              <View style={{ width: 100, height: 3, backgroundColor: "#FFF", marginHorizontal: 5, borderRadius: 3 }} />
+              if (isWinkNoodleSelected) {
+                updateNoodleCount("winkNoodle", noodleCounts.winkNoodle - 1);
+              }
+              navigation.navigate("Confirm")
+            }}
+          >
+            <View style={{ alignItems: "center" }}>
+              <Text style={{ fontFamily: "Paytone", fontSize: 20, fontWeight: "light", color: "#8B0000" }}>Get your noodles</Text>
+              <View style={{ flexDirection: "row", marginTop: 4 }}>
+                <View style={{ width: 50, height: 3, backgroundColor: "#FFF", marginHorizontal: 5, borderRadius: 3 }} />
+                <View style={{ width: 100, height: 3, backgroundColor: "#FFF", marginHorizontal: 5, borderRadius: 3 }} />
+              </View>
             </View>
-          </View>
-        </TouchableOpacity>
+          </TouchableOpacity>
+
+        ) : (
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#FFA500",
+              borderRadius: 25,
+              paddingVertical: 12,
+              width: width * 0.7,
+              alignItems: "center",
+              elevation: 5,
+            }}
+
+          >
+            <View style={{ alignItems: "center" }}>
+              <Text style={{ fontFamily: "Paytone", fontSize: 20, fontWeight: "light", color: "#8B0000" }}>Come back next month</Text>
+              <View style={{ flexDirection: "row", marginTop: 4 }}>
+                <View style={{ width: 50, height: 3, backgroundColor: "#FFF", marginHorizontal: 5, borderRadius: 3 }} />
+                <View style={{ width: 100, height: 3, backgroundColor: "#FFF", marginHorizontal: 5, borderRadius: 3 }} />
+              </View>
+            </View>
+          </TouchableOpacity>
+
+        )}
       </View>
 
     </ScrollView>

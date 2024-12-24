@@ -175,12 +175,7 @@ const WelcomeScreen = ({ navigation }: { navigation: any }) => {
             {/* Dispense Section */}
             <View style={{ flex: 1, flexDirection: 'row', justifyContent: "flex-end", alignItems: "center", marginTop: 120 }}>
                 <TouchableOpacity onPress={() => {
-                    if (totalNoodle > 0) {
-                        navigation.navigate("Info")
-                    }
-                    else {
-                        navigation.navigate("OutOfNoodle")
-                    }
+                    navigation.navigate("Info");
                 }}>
                     <Image style={{ height: 180, width: 140 }} source={require("../assets/dispense-section.png")}>
                     </Image>
