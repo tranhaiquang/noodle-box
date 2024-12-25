@@ -3,9 +3,6 @@ import { View, TouchableOpacity, Text, Image, Dimensions, ScrollView, ActivityIn
 import { LinearGradient } from "expo-linear-gradient";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import * as ImagePicker from "expo-image-picker";
-import { storage } from "../config/firebase";
-import { ref, uploadBytes } from 'firebase/storage';
 import { db, } from '../config/firebase'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 SplashScreen.preventAutoHideAsync();
@@ -20,7 +17,6 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
     Paytone: require("../assets/fonts/PaytoneOne-Regular.ttf")
   });
 
-  const [image, setImage] = useState("");
   const [loading, setLoading] = useState(true);
 
   // First Noodle Cup
@@ -88,42 +84,6 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
   if (!fontLoaded && !error) {
     return null; // App should wait until fonts are loaded or error occurs
   }
-
-
-  // Pick Image Function
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images", "videos"],
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-      console.log(image)
-    }
-
-    try {
-      const response = await fetch(image);
-      // Check if the fetch was successful
-      if (!response.ok) {
-        console.error("Failed to fetch image:", response.statusText);
-        return null;
-      }
-
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-
-      const blob = await response.blob();
-      const storageRef = ref(storage, `images/${timestamp}.gif`);
-      const snapshot = await uploadBytes(storageRef, blob);
-    } catch (error) {
-      console.error("Error uploading image:", error);
-      return null;
-    }
-  };
-
-
 
   return (
 

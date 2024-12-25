@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, TouchableOpacity, Text, Image, Dimensions, ScrollView } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import * as ImagePicker from "expo-image-picker";
-import { storage } from "../config/firebase";
-import { createStackNavigator } from "@react-navigation/stack";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -18,8 +14,6 @@ const ErrorScreen = ({ navigation }: { navigation: any }) => {
         Paytone: require("../assets/fonts/PaytoneOne-Regular.ttf")
     });
 
-    const [image, setImage] = useState("");
-
     useEffect(() => {
         if (loaded || error) {
             SplashScreen.hideAsync();
@@ -27,20 +21,6 @@ const ErrorScreen = ({ navigation }: { navigation: any }) => {
     }, [loaded, error]);
 
     if (!loaded && !error) return null;
-
-    // Pick Image Function
-    const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ["images", "videos"],
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1,
-        });
-
-        if (!result.canceled) {
-            setImage(result.assets[0].uri);
-        }
-    };
 
     return (
         <ScrollView contentContainerStyle={{ alignItems: "center", flexGrow: 1, paddingVertical: 20 }}>

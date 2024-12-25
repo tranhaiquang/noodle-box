@@ -3,12 +3,11 @@ import { View, TouchableOpacity, Text, Dimensions, ScrollView } from "react-nati
 import { LinearGradient } from "expo-linear-gradient";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import * as ImagePicker from "expo-image-picker";
 import { storage } from "../config/firebase";
 import { ref, getDownloadURL } from "firebase/storage";
 import { Image } from 'expo-image';
-import { db, } from '../config/firebase'
-import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { getNoodleCount } from '../config/firebase'
+
 SplashScreen.preventAutoHideAsync();
 
 const { width, height } = Dimensions.get("window");
@@ -20,7 +19,6 @@ const WelcomeScreen = ({ navigation }: { navigation: any }) => {
         Paytone: require("../assets/fonts/PaytoneOne-Regular.ttf")
     });
 
-    const [image, setImage] = useState("");
     const [noodleGifUrl, setNoodleGifUrl] = useState("");
 
     const [noodleCounts, setNoodleCounts] = useState({
@@ -31,29 +29,6 @@ const WelcomeScreen = ({ navigation }: { navigation: any }) => {
     });
 
     const totalNoodle = noodleCounts.heartNoodle + noodleCounts.smileNoodle + noodleCounts.winkNoodle;
-
-    const getNoodleCount = async () => {
-        try {
-            // Reference to the document you want to fetch
-            const docRef = doc(db, "noodle-box", "noodle-count") // Replace 'noodles' with your collection and 'document-id' with the document ID
-
-            // Fetch the document
-            const documentSnapshot = await getDoc(docRef)
-
-            if (documentSnapshot.exists()) {
-                setNoodleCounts({
-                    heartNoodle: documentSnapshot.data().heartNoodle,
-                    smileNoodle: documentSnapshot.data().smileNoodle,
-                    winkNoodle: documentSnapshot.data().winkNoodle,
-                });
-            } else {
-                console.log("No such document!");
-                return -1;
-            }
-        } catch (error) {
-            console.error('Error fetching document: ', error);
-        }
-    };
 
     const fetchNoodleGif = async () => {
         try {
@@ -68,31 +43,22 @@ const WelcomeScreen = ({ navigation }: { navigation: any }) => {
             console.error("Error fetching image: ", error);
         }
     };
+
     useEffect(() => {
         if (loaded || error) {
             SplashScreen.hideAsync();
         }
-        fetchNoodleGif();
-        getNoodleCount();
-
+        const fetchData = async () => {
+            fetchNoodleGif();
+            const noodleData = await getNoodleCount();
+            if (noodleData) {
+                setNoodleCounts(noodleData);
+            }
+        }
+        fetchData();
     }, [loaded, error]);
 
     if (!loaded && !error) return null;
-
-    // Pick Image Function
-    const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ["images", "videos"],
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1,
-        });
-
-        if (!result.canceled) {
-            setImage(result.assets[0].uri);
-        }
-    };
-
 
     return (
         <ScrollView contentContainerStyle={{ alignItems: "center", flexGrow: 1, paddingVertical: 20 }}>
@@ -175,7 +141,12 @@ const WelcomeScreen = ({ navigation }: { navigation: any }) => {
             {/* Dispense Section */}
             <View style={{ flex: 1, flexDirection: 'row', justifyContent: "flex-end", alignItems: "center", marginTop: 120 }}>
                 <TouchableOpacity onPress={() => {
-                    navigation.navigate("Info");
+                    if (totalNoodle > 0) {
+                        navigation.navigate("Info");
+                    }
+                    else {
+                        navigation.navigate("OutOfNoodle")
+                    }
                 }}>
                     <Image style={{ height: 180, width: 140 }} source={require("../assets/dispense-section.png")}>
                     </Image>

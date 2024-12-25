@@ -1,10 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { View, TouchableOpacity, Text, Image, Dimensions, ScrollView } from "react-native";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import * as ImagePicker from "expo-image-picker";
-import { storage } from "../config/firebase";
-import { ref, uploadBytes } from 'firebase/storage';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -18,8 +15,6 @@ const ConfirmationScreen = ({ navigation }: { navigation: any }) => {
         MPlus: require("../assets/fonts/MPLUS1p-Medium.ttf")
     });
 
-    const [image, setImage] = useState("");
-
     useEffect(() => {
         if (loaded || error) {
             SplashScreen.hideAsync();
@@ -28,37 +23,6 @@ const ConfirmationScreen = ({ navigation }: { navigation: any }) => {
 
     if (!loaded && !error) return null;
 
-    // Pick Image Function
-    const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ["images", "videos"],
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1,
-        });
-
-        if (!result.canceled) {
-            setImage(result.assets[0].uri);
-            console.log(image);
-        }
-
-        try {
-            const response = await fetch(image);
-            if (!response.ok) {
-                console.error("Failed to fetch image:", response.statusText);
-                return null;
-            }
-
-            const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-
-            const blob = await response.blob();
-            const storageRef = ref(storage, `images/${timestamp}.gif`);
-            await uploadBytes(storageRef, blob);
-        } catch (error) {
-            console.error("Error uploading image:", error);
-            return null;
-        }
-    };
 
     return (
         <View style={{ flex: 1 }}>
@@ -167,14 +131,7 @@ const ConfirmationScreen = ({ navigation }: { navigation: any }) => {
                         <Text style={{ fontFamily: "MPlus", fontSize: 25, fontWeight: "bold", textAlign: "center", color: "#F8C135" }}>Get them below</Text>
                     </View>
 
-                    {/*Arrow image*/}
-                    <View style={{ flex: 1, alignItems: "center" }}>
-                        <TouchableOpacity onPress={() => { navigation.navigate("OutOfNoodle") }}>
-                            <Image style={{ height: 40, width: 25 }} source={require("../assets/down-arrow.png")}>
-                            </Image>
 
-                        </TouchableOpacity>
-                    </View>
                 </View>
             </ScrollView>
         </View>

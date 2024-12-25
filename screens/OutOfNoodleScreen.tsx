@@ -1,10 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { View, TouchableOpacity, Text, Image, Dimensions, ScrollView } from "react-native";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import * as ImagePicker from "expo-image-picker";
-import { storage } from "../config/firebase";
-import { ref, uploadBytes } from 'firebase/storage';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -17,8 +14,6 @@ const OutOfNoodleScreen = ({ navigation }: { navigation: any }) => {
         Paytone: require("../assets/fonts/PaytoneOne-Regular.ttf"),
         MPlus: require("../assets/fonts/MPLUS1p-Medium.ttf")
     });
-
-    const [image, setImage] = useState("");
 
     useEffect(() => {
         if (loaded || error) {
