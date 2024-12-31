@@ -60,7 +60,10 @@ const ErrorScreen = ({ navigation }: { navigation: any }) => {
 
             {/* Try again text */}
             <View style={{ flex: 1, marginTop: 20 }}>
-                <Image style={{ height: 32, width: 160 }} source={require("../assets/scan-again.png")}></Image>
+                <TouchableOpacity onPress={() => navigation.navigate("Camera", { scanResult: "" })}>
+                    <Image style={{ height: 32, width: 160 }} source={require("../assets/scan-again.png")}></Image>
+
+                </TouchableOpacity>
             </View>
 
             {/* Error Image */}
@@ -76,12 +79,13 @@ const ErrorScreen = ({ navigation }: { navigation: any }) => {
 
             {/* Dispense Section */}
             <View style={{ flex: 1, flexDirection: 'row', justifyContent: "flex-end", alignItems: "center", marginTop: 120 }}>
-                <TouchableOpacity onPress={() => { navigation.navigate("Welcome") }}>
-                    <Image style={{ height: 180, width: 140 }} source={require("../assets/dispense-section.png")}>
-                    </Image>
-                </TouchableOpacity>
+                <Image style={{ height: 180, width: 140 }} source={require("../assets/dispense-section.png")}>
+                </Image>
                 <View style={{ position: "absolute", left: 160 }}>
-                    <Image style={{ height: 50, width: 100, }} source={require("../assets/right-arrow.png")}></Image>
+                    <TouchableOpacity onPress={() => navigation.navigate("Welcome")}>
+                        <Image style={{ height: 50, width: 100, }} source={require("../assets/right-arrow.png")}></Image>
+
+                    </TouchableOpacity>
                 </View>
             </View>
 

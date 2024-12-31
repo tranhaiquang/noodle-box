@@ -10,6 +10,7 @@ import WelcomeScreen from "./screens/WelcomeScreen";
 import ConfirmationScreen from "./screens/ConfirmationScreen";
 import OutOfNoodleScreen from "./screens/OutOfNoodleScreen";
 import ErrorScreen from "./screens/ErrorScreen";
+import CameraScreen from "./screens/CameraScreen";
 import { db, getNoodleCount } from './config/firebase';
 import { doc, getDoc } from 'firebase/firestore'
 const Stack = createStackNavigator<RootStackParamList>();
@@ -25,6 +26,8 @@ const App = () => {
           <Stack.Screen name="Confirm" component={ConfirmationScreen} />
           <Stack.Screen name="OutOfNoodle" component={OutOfNoodleScreen} />
           <Stack.Screen name="Error" component={ErrorScreen} />
+          <Stack.Screen name="Camera" component={CameraScreen} />
+
         </Stack.Navigator>
     </NavigationContainer>
   );

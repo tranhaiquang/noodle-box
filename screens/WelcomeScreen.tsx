@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, TouchableOpacity, Text, Dimensions, ScrollView } from "react-native";
+import { View, TouchableOpacity, Text, Dimensions, ScrollView, StyleSheet, Button } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
@@ -7,27 +7,39 @@ import { storage } from "../config/firebase";
 import { ref, getDownloadURL } from "firebase/storage";
 import { Image } from 'expo-image';
 import { getNoodleCount } from '../config/firebase'
-
+import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp } from '@react-navigation/native';
+import { RootStackParamList } from "../navigation/types";
 SplashScreen.preventAutoHideAsync();
 
 const { width, height } = Dimensions.get("window");
 
-const WelcomeScreen = ({ navigation }: { navigation: any }) => {
+type WelcomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Welcome'>;
+type WelcomeScreenRouteProp = RouteProp<RootStackParamList, 'Welcome'>;
+type Props = {
+    navigation: WelcomeScreenNavigationProp;
+    route: WelcomeScreenRouteProp;
+};
+
+const WelcomeScreen = ({ navigation, route }: Props) => {
     const [loaded, error] = useFonts({
         "SVN-Nexa Rust Slab Black Shadow": require("../assets/fonts/SVN-Nexa Rust Slab Black Shadow.ttf"),
         Nunito: require("../assets/fonts/Nunito-VariableFont_wght.ttf"),
         Paytone: require("../assets/fonts/PaytoneOne-Regular.ttf")
     });
-
+    const [scanResult, setScanResult] = useState("");
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("")
+    const [isButtonEnabled, setButtonEnabled] = useState(false)
+    const [isCameraActive, setIsCameraActive] = useState(false);
     const [noodleGifUrl, setNoodleGifUrl] = useState("");
-
     const [noodleCounts, setNoodleCounts] = useState({
         heartNoodle: 0,
         smileNoodle: 0,
         winkNoodle: 0,
 
     });
-
     const totalNoodle = noodleCounts.heartNoodle + noodleCounts.smileNoodle + noodleCounts.winkNoodle;
 
     const fetchNoodleGif = async () => {
@@ -43,6 +55,27 @@ const WelcomeScreen = ({ navigation }: { navigation: any }) => {
             console.error("Error fetching image: ", error);
         }
     };
+
+
+    useEffect(() => {
+        setButtonEnabled(false)
+        setScanResult(route.params?.scanResult)
+
+        if (scanResult) {
+            const user = JSON.parse(scanResult);
+
+            setUsername(user.username)
+            setPassword(user.password)
+
+            if (scanResult === "Hello World") {
+                setButtonEnabled(true)
+            }
+            else {
+                navigation.navigate("Error")
+            }
+        }
+
+    }, [scanResult])
 
     useEffect(() => {
         if (loaded || error) {
@@ -61,6 +94,7 @@ const WelcomeScreen = ({ navigation }: { navigation: any }) => {
     if (!loaded && !error) return null;
 
     return (
+
         <ScrollView contentContainerStyle={{ alignItems: "center", flexGrow: 1, paddingVertical: 20 }}>
             <Image
                 style={{
@@ -133,14 +167,18 @@ const WelcomeScreen = ({ navigation }: { navigation: any }) => {
 
             {/*Scan Text*/}
             <View>
-                <Image style={{ height: 40, width: 340, marginTop: 60 }} source={require("../assets/scan-text.png")}>
-                </Image>
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate("Camera", { scanResult: undefined })
+                }}>
+                    <Image style={{ height: 40, width: 340, marginTop: 60 }} source={require("../assets/scan-text.png")}>
+                    </Image>
+                </TouchableOpacity>
             </View>
 
 
             {/* Dispense Section */}
             <View style={{ flex: 1, flexDirection: 'row', justifyContent: "flex-end", alignItems: "center", marginTop: 120 }}>
-                <TouchableOpacity onPress={() => {
+                <TouchableOpacity disabled={!isButtonEnabled} onPress={() => {
                     if (totalNoodle > 0) {
                         navigation.navigate("Info");
                     }
@@ -153,16 +191,47 @@ const WelcomeScreen = ({ navigation }: { navigation: any }) => {
                 </TouchableOpacity>
 
                 <View style={{ position: "absolute", left: 160 }}>
-                    <TouchableOpacity onPress={() => { navigation.navigate("Error") }}>
-                        <Image style={{ height: 50, width: 100, }} source={require("../assets/right-arrow.png")}></Image>
-                    </TouchableOpacity>
+
+                    <Image style={{ height: 50, width: 100, }} source={require("../assets/right-arrow.png")}></Image>
+
                 </View>
 
             </View>
 
         </ScrollView >
 
+
+
+
     );
 };
-
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+    },
+    message: {
+        textAlign: 'center',
+        paddingBottom: 10,
+    },
+    camera: {
+        flex: 1,
+    },
+    buttonContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        backgroundColor: 'transparent',
+        margin: 64,
+    },
+    button: {
+        flex: 1,
+        alignSelf: 'flex-end',
+        alignItems: 'center',
+    },
+    text: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: 'white',
+    },
+});
 export default WelcomeScreen;

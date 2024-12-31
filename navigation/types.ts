@@ -4,5 +4,5 @@ export type RootStackParamList = {
   Welcome: undefined;
   OutOfNoodle: undefined;
   Error: undefined;
-  App: undefined;
+  Camera: { scanResult?: string };
 };

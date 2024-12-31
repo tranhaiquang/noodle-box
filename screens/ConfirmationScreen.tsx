@@ -23,7 +23,6 @@ const ConfirmationScreen = ({ navigation }: { navigation: any }) => {
 
     if (!loaded && !error) return null;
 
-
     return (
         <View style={{ flex: 1 }}>
             {/* Background */}
