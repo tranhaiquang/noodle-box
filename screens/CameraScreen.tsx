@@ -17,13 +17,13 @@ export default function CameraScreen({ navigation }: { navigation: any }) {
     const [permission, requestPermission] = useCameraPermissions();
     const [scanResult, setScanResult] = useState("");
 
-    console.log(scanResult)
+    
     useEffect(() => {
 
         if (scanResult != "") {
             navigation.navigate("Welcome", {scanResult: scanResult})
         }
-                
+
     })
     if (!permission) {
         // Camera permissions are still loading.

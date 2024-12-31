@@ -3,6 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getStorage } from "firebase/storage";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -42,9 +43,24 @@ const getNoodleCount = async () => {
   }
 };
 
+const signIn = async (email, password) => {
+  try {
+    // Await the async operation
+    const result = await signInWithEmailAndPassword(auth, email, password);
+
+    // Handle success
+    console.log("User signed in:", result.user);
+    return result.user;
+  } catch (error) {
+    // Handle errors
+    console.error("Error signing in:", error.message);
+    throw error;
+  }
+};
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const storage = getStorage(app);
 const db = getFirestore(app);
-export { storage, db, getNoodleCount };
+const auth = getAuth(app);
+export { storage, db, getNoodleCount, auth, signIn };

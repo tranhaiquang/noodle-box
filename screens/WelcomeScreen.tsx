@@ -3,14 +3,14 @@ import { View, TouchableOpacity, Text, Dimensions, ScrollView, StyleSheet, Butto
 import { LinearGradient } from "expo-linear-gradient";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import { storage } from "../config/firebase";
+import { storage, signIn } from "../config/firebase";
 import { ref, getDownloadURL } from "firebase/storage";
 import { Image } from 'expo-image';
 import { getNoodleCount } from '../config/firebase'
-import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from "../navigation/types";
+
 SplashScreen.preventAutoHideAsync();
 
 const { width, height } = Dimensions.get("window");
@@ -63,19 +63,29 @@ const WelcomeScreen = ({ navigation, route }: Props) => {
 
         if (scanResult) {
             const user = JSON.parse(scanResult);
-
             setUsername(user.username)
             setPassword(user.password)
-
-            if (scanResult === "Hello World") {
-                setButtonEnabled(true)
-            }
-            else {
-                navigation.navigate("Error")
-            }
         }
 
     }, [scanResult])
+
+
+    useEffect(() => {
+        const handleLogin = async () => {
+            if (username && password) {
+                try {
+                    signIn(username, password)
+                    setButtonEnabled(true)
+                }
+                catch (error) {
+                    console.error("Login Failed")
+                    setButtonEnabled(false)
+                    navigation.navigate("Error")
+                }
+            }
+        };
+        handleLogin()
+    }, [username, password, navigation])
 
     useEffect(() => {
         if (loaded || error) {
