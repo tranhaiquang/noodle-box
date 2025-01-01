@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, TouchableOpacity, Text, Dimensions, ScrollView, StyleSheet, Button } from "react-native";
+import { View, TouchableOpacity, Text, Dimensions, ScrollView, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
@@ -28,11 +28,10 @@ const WelcomeScreen = ({ navigation, route }: Props) => {
         Nunito: require("../assets/fonts/Nunito-VariableFont_wght.ttf"),
         Paytone: require("../assets/fonts/PaytoneOne-Regular.ttf")
     });
+    const [isReadyToNavigate, setIsReadyToNavigate] = useState(false);
     const [scanResult, setScanResult] = useState("");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("")
-    const [isButtonEnabled, setButtonEnabled] = useState(false)
-    const [isCameraActive, setIsCameraActive] = useState(false);
     const [noodleGifUrl, setNoodleGifUrl] = useState("");
     const [noodleCounts, setNoodleCounts] = useState({
         heartNoodle: 0,
@@ -58,7 +57,6 @@ const WelcomeScreen = ({ navigation, route }: Props) => {
 
 
     useEffect(() => {
-        setButtonEnabled(false)
         setScanResult(route.params?.scanResult)
 
         if (scanResult) {
@@ -68,24 +66,6 @@ const WelcomeScreen = ({ navigation, route }: Props) => {
         }
 
     }, [scanResult])
-
-
-    useEffect(() => {
-        const handleLogin = async () => {
-            if (username && password) {
-                try {
-                    signIn(username, password)
-                    setButtonEnabled(true)
-                }
-                catch (error) {
-                    console.error("Login Failed")
-                    setButtonEnabled(false)
-                    navigation.navigate("Error")
-                }
-            }
-        };
-        handleLogin()
-    }, [username, password, navigation])
 
     useEffect(() => {
         if (loaded || error) {
@@ -101,7 +81,31 @@ const WelcomeScreen = ({ navigation, route }: Props) => {
         fetchData();
     }, [loaded, error]);
 
-    if (!loaded && !error) return null;
+    useEffect(() => {
+        const handleLogin = async () => {
+            if (username && password && totalNoodle !== null) {
+                try {
+                    await signIn(username, password)
+                    setIsReadyToNavigate(true)
+                }
+                catch (error) {
+                    console.error("Login Failed")
+                    navigation.navigate("Error")
+                }
+            }
+        };
+        handleLogin()
+    }, [username, password, totalNoodle])
+
+
+    useEffect(() => {
+        // Navigate only when ready
+        if (isReadyToNavigate) {
+            const nextScreen = totalNoodle > 0 ? "Info" : "OutOfNoodle";
+            console.log("Navigating to:", nextScreen, "with noodleCounts:", totalNoodle);
+            navigation.navigate(nextScreen);
+        }
+    }, [isReadyToNavigate, totalNoodle, navigation]);
 
     return (
 
@@ -188,17 +192,8 @@ const WelcomeScreen = ({ navigation, route }: Props) => {
 
             {/* Dispense Section */}
             <View style={{ flex: 1, flexDirection: 'row', justifyContent: "flex-end", alignItems: "center", marginTop: 120 }}>
-                <TouchableOpacity disabled={!isButtonEnabled} onPress={() => {
-                    if (totalNoodle > 0) {
-                        navigation.navigate("Info");
-                    }
-                    else {
-                        navigation.navigate("OutOfNoodle")
-                    }
-                }}>
-                    <Image style={{ height: 180, width: 140 }} source={require("../assets/dispense-section.png")}>
-                    </Image>
-                </TouchableOpacity>
+                <Image style={{ height: 180, width: 140 }} source={require("../assets/dispense-section.png")}>
+                </Image>
 
                 <View style={{ position: "absolute", left: 160 }}>
 
