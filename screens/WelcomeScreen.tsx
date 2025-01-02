@@ -6,7 +6,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { storage, signIn } from "../config/firebase";
 import { ref, getDownloadURL } from "firebase/storage";
 import { Image } from 'expo-image';
-import { getNoodleCount } from '../config/firebase'
+import { getNoodleCount, auth } from '../config/firebase'
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from "../navigation/types";
@@ -28,6 +28,7 @@ const WelcomeScreen = ({ navigation, route }: Props) => {
         Nunito: require("../assets/fonts/Nunito-VariableFont_wght.ttf"),
         Paytone: require("../assets/fonts/PaytoneOne-Regular.ttf")
     });
+    const [uid, setUid] = useState<string | undefined>(undefined);
     const [isReadyToNavigate, setIsReadyToNavigate] = useState(false);
     const [scanResult, setScanResult] = useState("");
     const [username, setUsername] = useState("");
@@ -64,7 +65,6 @@ const WelcomeScreen = ({ navigation, route }: Props) => {
             setUsername(user.username)
             setPassword(user.password)
         }
-
     }, [scanResult])
 
     useEffect(() => {
@@ -86,6 +86,8 @@ const WelcomeScreen = ({ navigation, route }: Props) => {
             if (username && password && totalNoodle !== null) {
                 try {
                     await signIn(username, password)
+                    const user = auth.currentUser;
+                    setUid(user?.uid)
                     setIsReadyToNavigate(true)
                 }
                 catch (error) {
@@ -95,15 +97,18 @@ const WelcomeScreen = ({ navigation, route }: Props) => {
             }
         };
         handleLogin()
-    }, [username, password, totalNoodle])
+    }, [username, password, totalNoodle, uid])
 
 
     useEffect(() => {
         // Navigate only when ready
         if (isReadyToNavigate) {
-            const nextScreen = totalNoodle > 0 ? "Info" : "OutOfNoodle";
-            console.log("Navigating to:", nextScreen, "with noodleCounts:", totalNoodle);
-            navigation.navigate(nextScreen);
+            if (totalNoodle > 0) {
+                navigation.navigate("Info", { uid: uid })
+            }
+            else {
+                navigation.navigate("Error");
+            }
         }
     }, [isReadyToNavigate, totalNoodle, navigation]);
 

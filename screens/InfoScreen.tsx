@@ -5,12 +5,21 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { db, } from '../config/firebase'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp } from '@react-navigation/native';
+import { RootStackParamList } from "../navigation/types";
 SplashScreen.preventAutoHideAsync();
 
 const { width, height } = Dimensions.get("window");
 
+type InfoScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Info'>;
+type InfoScreenRouteProp = RouteProp<RootStackParamList, 'Info'>;
+type Props = {
+  navigation: InfoScreenNavigationProp;
+  route: InfoScreenRouteProp;
+};
 
-const InfoScreen = ({ navigation }: { navigation: any }) => {
+const InfoScreen = ({ navigation, route }: Props) => {
   const [fontLoaded, error] = useFonts({
     "SVN-Nexa Rust Slab Black Shadow": require("../assets/fonts/SVN-Nexa Rust Slab Black Shadow.ttf"),
     Nunito: require("../assets/fonts/Nunito-VariableFont_wght.ttf"),
@@ -26,6 +35,13 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
   // Third Noodle Cup
   const [isWinkNoodleSelected, setWinkNoodleSelected] = useState(false)
 
+  const [userData, setUserData] = useState({
+    name: "",
+    birthday: Date(),
+    department: "",
+    avatarUrl: "",
+    gender: "",
+  })
 
   const [noodleCounts, setNoodleCounts] = useState({
     heartNoodle: 0,
@@ -36,13 +52,10 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
 
   const totalNoodle = noodleCounts.heartNoodle + noodleCounts.smileNoodle + noodleCounts.winkNoodle;
 
-
   const getNoodleCount = async () => {
     try {
-      // Reference to the document you want to fetch
-      const docRef = doc(db, "noodle-box", "noodle-count") // Replace 'noodles' with your collection and 'document-id' with the document ID
+      const docRef = doc(db, "noodle-box", "noodle-count")
 
-      // Fetch the document
       const documentSnapshot = await getDoc(docRef)
 
       if (documentSnapshot.exists()) {
@@ -65,6 +78,42 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
     const docRef = doc(db, "noodle-box", "noodle-count");
     await setDoc(docRef, { [fieldId]: count }, { merge: true })
   }
+
+
+  const getUserData = async (uid: string) => {
+    try {
+      const docRef = doc(db, "users", uid);
+      const documentSnapshot = await getDoc(docRef)
+
+      if (documentSnapshot.exists()) {
+        setUserData({
+          name: documentSnapshot.data().name,
+          birthday: documentSnapshot.data().birthday.toDate().toLocaleDateString(),
+          department: documentSnapshot.data().department,
+          gender: documentSnapshot.data().gender,
+          avatarUrl: documentSnapshot.data().avatarUrl,
+        });
+      } else {
+        console.log("No such document!");
+        return null; // Returning null instead of -1
+      }
+    } catch (error) {
+      console.error("Error fetching document: ", error);
+      return null; // Returning null on error
+    }
+  };
+
+  useEffect(() => {
+    const uid = route.params?.uid
+    const fetchUserData = async () => {
+      if (uid) {
+        await getUserData(uid)
+      }
+      setLoading(false)
+      console.log(userData.department)
+    };
+    fetchUserData()
+  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -138,7 +187,7 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
           }}
         >
           {/* Avatar */}
-          <Image style={{ height: 80, width: 80 }} source={require("../assets/avatar.png")} />
+          <Image style={{ height: 80, width: 80 }} source={{ uri: userData.avatarUrl }} />
           {/* Labels */}
           <View style={{ flex: 1, marginLeft: 10 }}>
             {["Full Name:", "Birthday:", "Gender:", "Department:"].map((label, idx) => (
@@ -149,8 +198,8 @@ const InfoScreen = ({ navigation }: { navigation: any }) => {
           </View>
           {/* Values */}
           <View style={{ flex: 1 }}>
-            {["Alice Mie", "12/10/1999", "Female", "Design"].map((value, idx) => (
-              <Text key={idx} style={{ fontFamily: "Nunito", color: "#880B0B" }}>
+            {[userData.name, userData.birthday, userData.gender, userData.department].map((value, idx) => (
+              <Text key={idx} style={{ fontFamily: "Nunito", color: "#880B0B", textTransform: "capitalize" }}>
                 {value}
               </Text>
             ))}
