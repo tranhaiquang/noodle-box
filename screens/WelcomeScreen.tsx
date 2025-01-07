@@ -10,6 +10,10 @@ import { getNoodleCount, auth } from '../config/firebase'
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from "../navigation/types";
+import { useDispatch, useSelector } from "react-redux";
+import { setNoodleGifUrl } from "../redux/slices/noodleGifSlice";
+import { setNoodleCounts } from "../redux/slices/noodleCountSlice"
+import { RootState } from "../redux/store";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -28,18 +32,14 @@ const WelcomeScreen = ({ navigation, route }: Props) => {
         Nunito: require("../assets/fonts/Nunito-VariableFont_wght.ttf"),
         Paytone: require("../assets/fonts/PaytoneOne-Regular.ttf")
     });
+    const dispatch = useDispatch();
     const [uid, setUid] = useState<string | undefined>(undefined);
     const [isReadyToNavigate, setIsReadyToNavigate] = useState(false);
     const [scanResult, setScanResult] = useState("");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("")
-    const [noodleGifUrl, setNoodleGifUrl] = useState("");
-    const [noodleCounts, setNoodleCounts] = useState({
-        heartNoodle: 0,
-        smileNoodle: 0,
-        winkNoodle: 0,
-
-    });
+    const noodleGifUrl = useSelector((state: RootState) => state.noodleGif.noodleGifUrl);  // Get the image URL from Redux
+    const noodleCounts = useSelector((state: RootState) => state.noodleCount.noodleCounts);
     const totalNoodle = noodleCounts.heartNoodle + noodleCounts.smileNoodle + noodleCounts.winkNoodle;
 
     const fetchNoodleGif = async () => {
@@ -50,22 +50,23 @@ const WelcomeScreen = ({ navigation, route }: Props) => {
             // Get the download URL
             const url = await getDownloadURL(imageRef);
 
-            setNoodleGifUrl(url)
+            dispatch(setNoodleGifUrl(url))
         } catch (error) {
             console.error("Error fetching image: ", error);
         }
     };
 
-
     useEffect(() => {
-        setScanResult(route.params?.scanResult)
+        const result = route.params?.scanResult || '';
+        setScanResult(result);
 
         if (scanResult) {
             const user = JSON.parse(scanResult);
             setUsername(user.username)
             setPassword(user.password)
         }
-    }, [scanResult])
+    }, [scanResult, dispatch])
+
 
     useEffect(() => {
         if (loaded || error) {
@@ -75,11 +76,11 @@ const WelcomeScreen = ({ navigation, route }: Props) => {
             fetchNoodleGif();
             const noodleData = await getNoodleCount();
             if (noodleData) {
-                setNoodleCounts(noodleData);
+                dispatch(setNoodleCounts(noodleData));
             }
         }
         fetchData();
-    }, [loaded, error]);
+    }, [loaded, error, dispatch]);
 
     useEffect(() => {
         const handleLogin = async () => {
@@ -107,8 +108,9 @@ const WelcomeScreen = ({ navigation, route }: Props) => {
                 navigation.navigate("Info", { uid: uid })
             }
             else {
-                navigation.navigate("Error");
+                navigation.navigate("OutOfNoodle")
             }
+
         }
     }, [isReadyToNavigate, totalNoodle, navigation]);
 
