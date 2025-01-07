@@ -8,6 +8,11 @@ import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from "../navigation/types";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../redux/store";
+import { setUserData } from "../redux/slices/userSlice";
+import { getNoodleCount } from "../config/firebase";
+import { setNoodleCounts } from "../redux/slices/noodleCountSlice";
 SplashScreen.preventAutoHideAsync();
 
 const { width, height } = Dimensions.get("window");
@@ -27,6 +32,7 @@ const InfoScreen = ({ navigation, route }: Props) => {
   });
 
   const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
 
   // First Noodle Cup
   const [isSmileNoodleSelected, setSmileNoodleSelected] = useState(false);
@@ -35,43 +41,12 @@ const InfoScreen = ({ navigation, route }: Props) => {
   // Third Noodle Cup
   const [isWinkNoodleSelected, setWinkNoodleSelected] = useState(false)
 
-  const [userData, setUserData] = useState({
-    name: "",
-    birthday: Date(),
-    department: "",
-    avatarUrl: "",
-    gender: "",
-  })
+  const userData = useSelector((state: RootState) => state.userData.userData);
 
-  const [noodleCounts, setNoodleCounts] = useState({
-    heartNoodle: 0,
-    smileNoodle: 0,
-    winkNoodle: 0,
-
-  });
+  const noodleCounts = useSelector((state: RootState) => state.noodleCount.noodleCounts);
 
   const totalNoodle = noodleCounts.heartNoodle + noodleCounts.smileNoodle + noodleCounts.winkNoodle;
 
-  const getNoodleCount = async () => {
-    try {
-      const docRef = doc(db, "noodle-box", "noodle-count")
-
-      const documentSnapshot = await getDoc(docRef)
-
-      if (documentSnapshot.exists()) {
-        setNoodleCounts({
-          heartNoodle: documentSnapshot.data().heartNoodle,
-          smileNoodle: documentSnapshot.data().smileNoodle,
-          winkNoodle: documentSnapshot.data().winkNoodle,
-        });
-      } else {
-        console.log("No such document!");
-        return -1;
-      }
-    } catch (error) {
-      console.error('Error fetching document: ', error);
-    }
-  };
 
   // update noodle count when users click "Get your noodles"
   const updateNoodleCount = async (fieldId: string, count: number) => {
@@ -86,13 +61,13 @@ const InfoScreen = ({ navigation, route }: Props) => {
       const documentSnapshot = await getDoc(docRef)
 
       if (documentSnapshot.exists()) {
-        setUserData({
+        dispatch(setUserData({
           name: documentSnapshot.data().name,
           birthday: documentSnapshot.data().birthday.toDate().toLocaleDateString(),
           department: documentSnapshot.data().department,
           gender: documentSnapshot.data().gender,
           avatarUrl: documentSnapshot.data().avatarUrl,
-        });
+        }));
       } else {
         console.log("No such document!");
         return null; // Returning null instead of -1
@@ -104,24 +79,31 @@ const InfoScreen = ({ navigation, route }: Props) => {
   };
 
   useEffect(() => {
-    const uid = route.params?.uid
     const fetchUserData = async () => {
-      if (uid) {
-        await getUserData(uid)
+      try {
+        const uid = route.params?.uid;
+        if (uid) await getUserData(uid);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false)
-      console.log(userData.department)
     };
-    fetchUserData()
-  }, [])
 
+    fetchUserData();
+  }, [route.params?.uid]);
+
+  
   useEffect(() => {
     const fetchData = async () => {
-      await getNoodleCount();
+      const noodleData = await getNoodleCount();
+      if (noodleData) {
+        dispatch(setNoodleCounts(noodleData));
+      }
       setLoading(false);
     };
     fetchData();
-  }, []);
+  }, [dispatch]);
 
 
   useEffect(() => {
